@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    ports:
+      - "8080:4000" # Porta 4000 do backend mapeada para 8080 no host
+    env_file:
+      - .env
+    networks:
+      - app-network
+    volumes:
+      - ./back-end:/app
+      - /app/node_modules
+      - /app/build
+    command: [ "node", "build/server.js" ]
+
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    ports:
+      - "80:4173" # Porta 4173 do frontend mapeada para 80 no host
+    networks:
+      - app-network
+    env_file:
+      - ./front-end/.env
+    volumes:
+      - ./front-end:/app
+      - /app/node_modules
+      - /app/dist
+    command: [ "npm", "run", "preview" ]
+
+networks:
+  app-network:
+    driver: bridge
